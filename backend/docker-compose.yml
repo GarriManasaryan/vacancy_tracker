@@ -1,0 +1,62 @@
+version: "3"
+name: vacancy-tracker
+services:
+  database:
+    image: postgres:14.5
+    container_name: py_db_container_vacancy_tracker
+    hostname: py_db_vacancy_tracker
+    environment:
+      - POSTGRES_PASSWORD=1
+      - POSTGRES_USER=postgres
+
+#    volumes:
+#      - pg_data_v2:/var/lib/postgresql/data
+
+    expose:
+      - "5433"
+    ports:
+      - "5433:5433"
+    command: -p 5433
+
+  backend:
+#    container_name: vacancy_tracker_backend
+    build: .
+    command: bash -c 'uvicorn web_app:create_app --factory --reload --host 0.0.0.0 --port 5000'
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://postgres:1@localhost:5433/vacancy_tracker
+      - FASTAPI_DEBUG=true
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - PYDEVD_DISABLE_FILE_VALIDATION=1
+      - FASTAPI_PORT=5000
+      - FASTAPI_RUN_HOST=0.0.0.0
+      - INSIDE_DOCKER=true
+      - POSTGRESQL_HOST=py_db_vacancy_tracker
+      - POSTGRESQL_PORT=5433
+      - POSTGRESQL_DB_NAME=vacancy_tracker
+      - POSTGRESQL_USER=postgres
+      - POSTGRESQL_PASSWORD=1
+
+    ports: # fastapi
+      - "5000:5000"
+#      - "41993:41993" # для дев контейнерс
+    depends_on:
+      - database
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+#  frontend:
+##    image: garrri/testing_system_frontend:latest
+#    depends_on:
+#      - backend
+#
+#    build:
+#      dockerfile: Dockerfile.fk
+#    ports:
+#      - "3000:3000"
+
+#    stdin_open: true
+#    tty: true
+
+volumes:
+  postgres_data:
