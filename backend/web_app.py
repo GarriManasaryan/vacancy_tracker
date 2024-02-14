@@ -24,6 +24,7 @@ def create_app(config=None) -> FastAPI:
 
     app.include_router(project_route)
 
+    # middleware - intercepter
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],

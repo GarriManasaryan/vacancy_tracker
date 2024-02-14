@@ -1,17 +1,20 @@
+from contextvars import ContextVar
 from dataclasses import dataclass
 from os import getenv
-from typing import Type, ContextManager, Callable
+from typing import Type, ContextManager, Callable, Optional
 
 import psycopg2.extras
 from psycopg2._psycopg import cursor
 from psycopg2.pool import SimpleConnectionPool
 from sqlalchemy import NullPool
 
+
 connection_pool = SimpleConnectionPool(
     2, 12, user=getenv("POSTGRESQL_USER"), password=getenv("POSTGRESQL_PASSWORD"),
     host=getenv("POSTGRESQL_HOST"), port=getenv("POSTGRESQL_PORT"), database=getenv("POSTGRESQL_DB_NAME"))
 
 DbConnector = cursor
+db_cursor_context: ContextVar[Optional[DbConnector]] = ContextVar("db_cursor", default=None)
 
 
 @dataclass
@@ -72,15 +75,3 @@ class ConnectionFromPool:
             self.cursor.close()
             self.connection.commit()
         connection_pool.putconn(self.connection)
-
-
-def get_conn_pool():
-    """
-    при каждом импорте вызовется пул, если сюда запсиать
-    """
-    return connection_pool
-
-
-def get_connection():
-    # через with контекст надо, чтобы закрыл
-    return connection_pool.getconn()

@@ -1,26 +1,22 @@
-from config.app import DbConnector
-from domain.company import Company
-from domain.requirement import Requirement
+from domain.repo.salary_repo import SalaryRepo
 from domain.salary import Salary
-from port.adapters.backoffice.projections.company_proj import CompanyProjection
-from port.adapters.backoffice.projections.requirement_proj import RequirementsProjection
-from port.adapters.backoffice.projections.salary_proj import SalaryProjection
 from port.adapters.persistence.model.salary_sql_model import SalarySQLModel
-from port.adapters.persistence.model.requirement_sql_model import RequirementSQLModel
-from port.adapters.persistence.postgresql_executer import select, update
+from port.adapters.persistence.postgresql_executer import select, update, get_cursor
 
 
-class PostgreSQLSalaryProjection(SalaryProjection):
+class PostgreSQLSalaryRepo(SalaryRepo):
 
-    def save(self, salary: Salary, db_cursor: DbConnector = None) -> None:
+    def save(self, salary: Salary) -> None:
+        cursor = get_cursor()
         sql_template = (
             f"insert into {SalarySQLModel.table}"
             f"({SalarySQLModel.id_col}, {SalarySQLModel.min_col}, {SalarySQLModel.max_col}) "
             f"values"
             f"('{salary.id}', '{salary.min}', '{salary.max}')"
         )
-        update(cursor=db_cursor, sql_template=sql_template)
+        update(cursor=cursor, sql_template=sql_template)
 
-    def all(self, db_cursor: DbConnector = None) -> list[Salary]:
+    def all(self) -> list[Salary]:
+        cursor = get_cursor()
         sql_template = f"select * from {SalarySQLModel.table}"
-        return [Salary(**i) for i in select(cursor=db_cursor, sql_template=sql_template)]
+        return [Salary(**i) for i in select(cursor=cursor, sql_template=sql_template)]

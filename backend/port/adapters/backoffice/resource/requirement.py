@@ -1,17 +1,13 @@
-from dependency_injector.wiring import inject
-from fastapi import APIRouter
-
 from application.requirement_service import RequirementService
-from port.adapters.backoffice.projections.requirement_proj import (
-    RequirementsProjection,
-)
+from domain.repo.requirement_repo import RequirementsRepo
 from port.adapters.backoffice.requirement_model import (
     RequirementsCreationRequest,
     RequirementsBackofficeModel,
 )
 from port.adapters.persistence.postgresql_requirements_repo import (
-    PostgreSQLRequirementsProjection,
+    PostgreSQLRequirementsRepo,
 )
+
 
 # _service = RequirementsService(
 #     repository=PostgreSQLRequirementsProjection()
@@ -31,18 +27,15 @@ from port.adapters.persistence.postgresql_requirements_repo import (
 
 
 class RequirementsController:
-    @inject
-    def __init__(self):
+    def __init__(self, repository: RequirementsRepo):
         self._service = RequirementService(
-            repository=PostgreSQLRequirementsProjection()
+            repository=repository
         )
 
     def all(self) -> list[RequirementsBackofficeModel]:
         return self._service.all()
 
-    def save(
-        self, requirements_creation_request: RequirementsCreationRequest
-    ):
+    def save(self, requirements_creation_request: RequirementsCreationRequest):
         return self._service.save(
-            requirements_creation_request=requirements_creation_request
+            creation_request=requirements_creation_request
         )
