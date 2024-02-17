@@ -1,5 +1,3 @@
-from fastapi import HTTPException
-
 from common.decorators import transactional
 from domain.id_generator import IdGenerator
 from domain.repo.salary_repo import SalaryRepo
@@ -17,10 +15,6 @@ class SalaryService:
 
     @transactional
     def save(self, creation_request: SalaryCreationRequest) -> None:
-        if creation_request.min is None and creation_request.max is None:
-            raise HTTPException(
-                status_code=404, detail="Both min and max values cant be empty"
-            )
         self.repository.save(
             salary=Salary(
                 id=IdGenerator.generate("slr"),

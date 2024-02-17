@@ -7,10 +7,6 @@ from port.adapters.persistence.postgresql_executer import select, update, get_cu
 
 
 class PostgreSQLRequirementsRepo(RequirementsRepo):
-    @inject
-    def __init__(self):
-        pass
-
     def save(self, requirements: Requirement) -> None:
         cursor = get_cursor()
         sql_template = (

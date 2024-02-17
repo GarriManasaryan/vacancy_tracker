@@ -7,7 +7,9 @@ logger = logging.getLogger(__name__)
 
 class DatabaseTransactionManager:
     @inject
-    def __init__(self, db_connector: SQLAlchemyDatabaseConnector = Provide["db_connector"]):
+    def __init__(
+        self, db_connector: SQLAlchemyDatabaseConnector = Provide["db_connector"]
+    ):
         self._db = db_connector
 
     def get_transaction(self) -> Transaction:
@@ -15,12 +17,19 @@ class DatabaseTransactionManager:
         current_session = SessionHolder.session.get()
         if current_session:
             transaction = Transaction(is_new=False)
-            logger.debug("Use already opened session at transaction '%s'", str(transaction.id))
+            logger.debug(
+                "Use already opened session at transaction '%s'", str(transaction.id)
+            )
         else:
             transaction = Transaction(is_new=True)
-            logger.debug("Prepare to open a new session at transaction '%s'", str(transaction.id))
+            logger.debug(
+                "Prepare to open a new session at transaction '%s'", str(transaction.id)
+            )
             session = self._db.session_maker()
-            logger.debug("Session was opened successfully at transaction '%s'", str(transaction.id))
+            logger.debug(
+                "Session was opened successfully at transaction '%s'",
+                str(transaction.id),
+            )
             SessionHolder.set_session(session)
         return transaction
 
@@ -35,16 +44,22 @@ class DatabaseTransactionManager:
                 try:
                     session.rollback()
                 except Exception as rollback_error:
-                    logger.error(f"Transaction {transaction.id} could not rollback session. Reason: {rollback_error}.")
+                    logger.error(
+                        f"Transaction {transaction.id} could not rollback session. Reason: {rollback_error}."
+                    )
                 raise commit_error
             finally:
                 SessionHolder.detach_session()
                 try:
-                    logger.debug("Prepare to close session at transaction '%s'", transaction.id)
+                    logger.debug(
+                        "Prepare to close session at transaction '%s'", transaction.id
+                    )
                     session.close()
                     logger.debug(f"Session {transaction.id} closed.")
                 except Exception as e:
-                    logger.warning(f"Session {transaction.id} could not close session. Reason: {e}.")
+                    logger.warning(
+                        f"Session {transaction.id} could not close session. Reason: {e}."
+                    )
         else:
             logger.info(f"Transaction {transaction.id} will be committed.")
         transaction.detach_from_context()
@@ -62,11 +77,15 @@ class DatabaseTransactionManager:
                 raise e
             finally:
                 try:
-                    logger.debug("Prepare to close session at transaction '%s'", transaction.id)
+                    logger.debug(
+                        "Prepare to close session at transaction '%s'", transaction.id
+                    )
                     session.close()
                     logger.debug(f"Session {transaction.id} closed.")
                 except Exception as e:
-                    logger.warning(f"Transaction {transaction.id}. Error on closing: {e}.")
+                    logger.warning(
+                        f"Transaction {transaction.id}. Error on closing: {e}."
+                    )
         else:
             transaction.is_failed.set(True)
             logger.debug(f"Transaction {transaction.id} will be rolled back.")

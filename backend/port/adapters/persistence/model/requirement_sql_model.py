@@ -8,5 +8,5 @@ class RequirementSQLModel:
     name_col: str = "name"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(RequirementSQLModel.table)

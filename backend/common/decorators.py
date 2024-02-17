@@ -12,4 +12,3 @@ def transactional(func):
             return result
 
     return wrapper_func
-

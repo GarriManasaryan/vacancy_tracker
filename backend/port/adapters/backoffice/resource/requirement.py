@@ -28,14 +28,10 @@ from port.adapters.persistence.postgresql_requirements_repo import (
 
 class RequirementsController:
     def __init__(self, repository: RequirementsRepo):
-        self._service = RequirementService(
-            repository=repository
-        )
+        self._service = RequirementService(repository=repository)
 
     def all(self) -> list[RequirementsBackofficeModel]:
         return self._service.all()
 
     def save(self, requirements_creation_request: RequirementsCreationRequest):
-        return self._service.save(
-            creation_request=requirements_creation_request
-        )
+        return self._service.save(creation_request=requirements_creation_request)

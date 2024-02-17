@@ -1,15 +1,11 @@
-from fastapi import FastAPI, APIRouter
-from fastapi.openapi.utils import get_openapi
+from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
-
-from config.app import get_config
-from port.adapters.backoffice.resource.company import CompanyController
-# from port.adapters.backoffice.resource.requirements import requirements_router
-
-from port.adapters.backoffice.resource.requirement import RequirementsController
 from port.adapters.backoffice.resource.router import project_route
 
-g_config = get_config()
+# если надо функционально брать
+# from port.adapters.backoffice.resource.requirements import requirements_router
+
+# g_config = get_config()
 
 
 def create_app(config=None) -> FastAPI:
@@ -19,9 +15,6 @@ def create_app(config=None) -> FastAPI:
     app = FastAPI(root_path=".")
 
     # project_route.include_router(requirements.router)
-    # project_route.include_router(companies.router)
-    # project_route.include_router(requirements_router)
-
     app.include_router(project_route)
 
     # middleware - intercepter
